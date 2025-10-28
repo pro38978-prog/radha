@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffa500">
+    <meta name="description" content="Radha Radha Jap Counter App">
+    <title>Radha Radha</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🙏</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            min-height: 100vh;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 15px;
+        }
+
+        .background-radha {
+            position: absolute;
+            font-size: min(25vw, 150px);
+            color: rgba(255, 140, 0, 0.1);
+            font-weight: bold;
+            z-index: 0;
+            pointer-events: none;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-100px) translateY(-100px) rotate(0deg); }
+            100% { transform: translateX(100px) translateY(100px) rotate(360deg); }
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+        }
+
+        .title {
+            color: #d35400;
+            font-size: 28px;
+            margin-bottom: 25px;
+            font-weight: bold;
+        }
+
+        .counter-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff5733, #ff8c00);
+            margin: 0 auto 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            box-shadow: 0 8px 25px rgba(255, 87, 51, 0.4);
+            border: 5px solid white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .counter-circle:active {
+            transform: scale(0.95);
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #c0392b, #e74c3c);
+            color: white;
+        }
+
+        .history-btn {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .footer {
+            color: #d35400;
+            font-style: italic;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .modal-title {
+            color: #d35400;
+            font-size: 22px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .history-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            margin-bottom: 8px;
+            border-radius: 8px;
+        }
+
+        .session-number {
+            font-weight: bold;
+            color: #d35400;
+        }
+
+        .session-count {
+            font-weight: bold;
+            color: #27ae60;
+            font-size: 18px;
+        }
+
+        .session-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .close-btn {
+            background: #95a5a6;
+            color: white;
+            padding: 10px 20px;
+        }
+
+        .total-sessions {
+            background: #3498db;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+            }
+            
+            .counter-circle {
+                width: 180px;
+                height: 180px;
+                font-size: 42px;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-radha">राधा राधा</div>
+
+    <div class="container">
+        <div class="title">🚩 राधा राधा 🚩</div>
+        
+        <div class="counter-circle" id="counterCircle">
+            <span id="count">0</span>
+        </div>
+        
+        <div class="buttons">
+            <button class="reset-btn" onclick="resetCounter()">Reset</button>
+            <button class="history-btn" onclick="showHistory()">History</button>
+        </div>
+        
+        <div class="footer">हरि ओम</div>
+    </div>
+
+    <div class="modal" id="historyModal">
+        <div class="modal-content">
+            <div class="modal-title">जप सत्र इतिहास 📜</div>
+            
+            <div class="total-sessions">
+                कुल सत्र: <span id="totalSessions">0</span>
+            </div>
+            
+            <div class="history-list" id="historyList"></div>
+            <button class="close-btn" onclick="closeHistory()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        let count = 0;
+        let sessionHistory = [];
+        const countElement = document.getElementById('count');
+        const counterCircle = document.getElementById('counterCircle');
+        const historyModal = document.getElementById('historyModal');
+        const historyList = document.getElementById('historyList');
+        const totalSessionsElement = document.getElementById('totalSessions');
+
+        // Load data from localStorage
+        function loadData() {
+            const savedCount = localStorage.getItem('radhaCount');
+            const savedHistory = localStorage.getItem('radhaHistory');
+            
+            if (savedCount) {
+                count = parseInt(savedCount);
+                countElement.textContent = count;
+            }
+            
+            if (savedHistory) {
+                sessionHistory = JSON.parse(savedHistory);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('radhaCount', count);
+            localStorage.setItem('radhaHistory', JSON.stringify(sessionHistory));
+        }
+
+        // Create background texts
+        function createBackgroundTexts() {
+            for (let i = 0; i < 8; i++) {
+                const radhaText = document.createElement('div');
+                radhaText.className = 'background-radha';
+                radhaText.textContent = 'राधा राधा';
+                radhaText.style.left = Math.random() * 100 + 'vw';
+                radhaText.style.top = Math.random() * 100 + 'vh';
+                radhaText.style.animationDelay = Math.random() * 15 + 's';
+                radhaText.style.fontSize = (Math.random() * 100 + 80) + 'px';
+                document.body.appendChild(radhaText);
+            }
+        }
+
+        // Click anywhere to count
+        document.addEventListener('click', function(event) {
+            if (event.target.tagName === 'BUTTON' || event.target.closest('.modal-content')) {
+                return;
+            }
+            
+            count++;
+            countElement.textContent = count;
+            
+            // Visual feedback
+            counterCircle.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                counterCircle.style.transform = 'scale(1)';
+            }, 150);
+            
+            saveData();
+        });
+
+        // Reset counter
+        function resetCounter() {
+            if (count > 0) {
+                const now = new Date();
+                sessionHistory.push({
+                    sessionNumber: sessionHistory.length + 1,
+                    finalCount: count,
+                    date: now.toLocaleDateString('hi-IN'),
+                    time: now.toLocaleTimeString('hi-IN')
+                });
+            }
+            count = 0;
+            countElement.textContent = count;
+            saveData();
+        }
+
+        // Show history
+        function showHistory() {
+            historyList.innerHTML = '';
+            totalSessionsElement.textContent = sessionHistory.length;
+            
+            if (sessionHistory.length === 0) {
+                historyList.innerHTML = '<div class="history-item">अभी तक कोई सत्र पूरा नहीं हुआ</div>';
+            } else {
+                sessionHistory.slice().reverse().forEach((session) => {
+                    const item = document.createElement('div');
+                    item.className = 'history-item';
+                    item.innerHTML = `
+                        <div>
+                            <div class="session-number">सत्र ${session.sessionNumber}</div>
+                            <div class="session-time">${session.date} - ${session.time}</div>
+                        </div>
+                        <div class="session-count">${session.finalCount}</div>
+                    `;
+                    historyList.appendChild(item);
+                });
+            }
+            historyModal.style.display = 'flex';
+        }
+
+        // Close history
+        function closeHistory() {
+            historyModal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === historyModal) {
+                closeHistory();
+            }
+        });
+
+        // Initialize
+        window.onload = function() {
+            createBackgroundTexts();
+            loadData();
+        };
+    </script>
+</body>
+</html>
